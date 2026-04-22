@@ -1,0 +1,138 @@
+-- STEP 1: Create Database
+CREATE DATABASE The_walker_media;
+USE THE_walker_media;
+
+-- STEP 2: Create Tables
+
+CREATE TABLE clients (
+    client_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    country VARCHAR(50),
+    industry VARCHAR(100)
+);
+
+CREATE TABLE campaigns (
+    campaign_id INT PRIMARY KEY AUTO_INCREMENT,
+    client_id INT,
+    campaign_name VARCHAR(100),
+    platform VARCHAR(50),
+    budget DECIMAL(10,2),
+    start_date DATE,
+    end_date DATE,
+    FOREIGN KEY (client_id) REFERENCES clients(client_id)
+);
+
+CREATE TABLE employees (
+    employee_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    location VARCHAR(50),
+    role VARCHAR(100)
+);
+
+CREATE TABLE performance (
+    performance_id INT PRIMARY KEY AUTO_INCREMENT,
+    campaign_id INT,
+    impressions INT,
+    clicks INT,
+    conversions INT,
+    revenue DECIMAL(10,2),
+    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id)
+);
+
+-- STEP 3: Insert Clients
+
+INSERT INTO clients (name, country, industry) VALUES
+('ABC Fashion', 'India', 'Clothing'),
+('Dubai Luxury Cars', 'UAE', 'Automobile'),
+('TechZone', 'India', 'Electronics'),
+('Emirates Travel', 'UAE', 'Tourism'),
+('Fitness Pro', 'India', 'Health'),
+('Royal Real Estate', 'UAE', 'Property');
+
+-- STEP 4: Insert Campaigns
+
+INSERT INTO campaigns (client_id, campaign_name, platform, budget, start_date, end_date) VALUES
+(1, 'Instagram Sale India', 'Instagram', 50000, '2025-01-01', '2025-01-31'),
+(2, 'Google Ads Luxury UAE', 'Google', 120000, '2025-01-10', '2025-02-10'),
+(3, 'YouTube Tech India', 'YouTube', 80000, '2025-02-01', '2025-02-28'),
+(4, 'Facebook Travel UAE', 'Facebook', 90000, '2025-02-15', '2025-03-15'),
+(5, 'Fitness Influencer India', 'Instagram', 40000, '2025-03-01', '2025-03-30'),
+(6, 'Real Estate Ads UAE', 'Google', 150000, '2025-03-10', '2025-04-10');
+
+-- STEP 5: Insert Employees
+
+INSERT INTO employees (name, location, role) VALUES
+('Rahul Sharma', 'India', 'Manager'),
+('Sneha Gupta', 'India', 'Analyst'),
+('Amit Verma', 'India', 'SEO Specialist'),
+('Priya Mehta', 'India', 'Content Writer'),
+('Karan Malhotra', 'India', 'Social Media Manager'),
+('Neha Kapoor', 'India', 'Performance Marketer'),
+('Rohit Singh', 'India', 'Data Analyst'),
+('Anjali Desai', 'India', 'Graphic Designer'),
+('Ali Khan', 'Dubai', 'Ad Specialist'),
+('Omar Hassan', 'Dubai', 'Manager'),
+('Sara Ahmed', 'Dubai', 'Content Creator'),
+('Yusuf Al-Farsi', 'Dubai', 'Marketing Strategist'),
+('Fatima Noor', 'Dubai', 'Brand Manager'),
+('Khalid Mahmood', 'Dubai', 'PPC Expert'),
+('Layla Hassan', 'Dubai', 'Social Media Executive'),
+('Zaid Rahman', 'Dubai', 'Business Development Manager');
+
+-- STEP 6: Insert Performance Data
+
+INSERT INTO performance (campaign_id, impressions, clicks, conversions, revenue) VALUES
+(1, 120000, 6000, 550, 220000),
+(2, 250000, 9000, 800, 600000),
+(3, 180000, 7000, 650, 350000),
+(4, 200000, 7500, 720, 450000),
+(5, 100000, 5000, 480, 180000),
+(6, 300000, 10000, 950, 800000);
+
+-- STEP 7: TEST QUERIES
+
+-- 1. Show All Clients
+SELECT * FROM clients;
+
+-- 2. Show All Campaigns
+SELECT * FROM campaigns;
+
+-- 3. Show All Employees
+SELECT * FROM employees;
+
+-- 4. Show All Performance Data
+SELECT * FROM performance;
+
+-- 5. Revenue by Country
+SELECT c.country, SUM(p.revenue) AS total_revenue
+FROM clients c
+JOIN campaigns ca ON c.client_id = ca.client_id
+JOIN performance p ON ca.campaign_id = p.campaign_id
+GROUP BY c.country;
+
+-- 6. Top Campaign
+SELECT ca.campaign_name, p.revenue
+FROM campaigns ca
+JOIN performance p ON ca.campaign_id = p.campaign_id
+ORDER BY p.revenue DESC
+LIMIT 1;
+
+-- 7. ROI Calculation
+SELECT 
+    ca.campaign_name,
+    ca.budget,
+    p.revenue,
+    ROUND(((p.revenue - ca.budget) / ca.budget) * 100, 2) AS ROI_percent
+FROM campaigns ca
+JOIN performance p ON ca.campaign_id = p.campaign_id;
+
+-- 8. CTR
+SELECT 
+    campaign_id,
+    ROUND((clicks * 100.0 / impressions), 2) AS CTR_percent
+FROM performance;
+
+-- 9. Employees by Location
+SELECT location, COUNT(*) AS total_employees
+FROM employees
+GROUP BY location;
